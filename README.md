@@ -48,6 +48,31 @@ Test regresyjny: `test_zawijanie_kata_nie_daje_falszywego_alarmu`.
   mieszał gradient "po czasie" z gradientem "po indeksie próbki", co
   dawało niespójny wynik przy nierównomiernym próbkowaniu.
 
+## 🔗 Relacja do FLIGHT-TRACKING-TIMDR
+
+`Radar-TIMDR` to **generyczna, bazowa wersja 2D** — wejście to dowolna
+trajektoria `[x, y, t]` bez założeń o jednostkach czy geometrii Ziemi.
+Nadaje się do wizji komputerowej, robotyki, danych GPS czy analityki
+sportowej (patrz sekcja zastosowań niżej), ale **nie** do lotniczego
+śledzenia toru lotu wprost na współrzędnych geograficznych.
+
+Do danych `[lat, lon, alt, t]` (ADS-B, FDR, tor lotu) służy osobne,
+pochodne repozytorium:
+**[FLIGHT-TRACKING-TIMDR](https://github.com/jbackk-lang/FLIGHT-TRACKING-TIMDR)**
+— rozszerza ten moduł o rzutowanie geodezyjne (korekta `cos(lat)` przy
+liczeniu kursu, bo 1° długości geograficznej ≠ 1° szerokości w metrach),
+próg prędkości pionowej w m/s zamiast surowej różnicy próbek, oraz
+diagnostykę lotniczą (kurs, prędkość względem ziemi, prędkość pionowa).
+Sam bug zawijania kąta w `twist()` (opisany wyżej) był obecny w obu
+wersjach i został naprawiony tym samym sposobem (`np.unwrap()` przed
+gradientem) w obu repozytoriach.
+
+**Kiedy użyć którego:**
+- trajektoria w pikselach/metrach, bez geografii → `Radar-TIMDR`
+- trajektoria w stopniach lat/lon (dowolny tor GPS/ADS-B) →
+  `FLIGHT-TRACKING-TIMDR` — użycie tego modułu wprost na stopniach da
+  błędny kurs poza równikiem (patrz błąd 1 w README FLIGHT-TRACKING-TIMDR)
+
 ## 🎯 Zastosowania (i warunki, przy których mają sens)
 
 Moduł jest ogólnym narzędziem do analizy trajektorii 2D `[x, y, t]` — nie
